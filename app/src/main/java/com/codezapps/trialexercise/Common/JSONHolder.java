@@ -2,6 +2,7 @@ package com.codezapps.trialexercise.common;
 
 import android.util.Log;
 
+import com.codezapps.trialexercise.UI.fragments.PlayersAdapter;
 import com.codezapps.trialexercise.model.Player;
 import com.codezapps.trialexercise.model.Team;
 import com.codezapps.trialexercise.UI.MainActivity;
@@ -22,6 +23,9 @@ public class JSONHolder {
 
     private ArrayList<Player> mPlayers;
     private ArrayList<Team> mTeams;
+
+    private boolean canPullMorePlayers;
+    private boolean canPullMoreTeams;
 
     public JSONHolder() {
         mPlayers = new ArrayList<Player>();
@@ -52,10 +56,17 @@ public class JSONHolder {
             parseTeamsArray(resultObject.getJSONArray(TEAMS));
         }
         catch (JSONException ex){
-            if(MainActivity.LOGD)
+            if(MainActivity.LOGD){
                 Log.d("JSONHolder", "JSONException on parse");
-                ex.printStackTrace();
+                ex.printStackTrace();}
+            if(mPlayers.isEmpty()) canPullMorePlayers = false;
+            if(mTeams.isEmpty()) canPullMoreTeams = false;
         }
+    }
+
+    public boolean canPullMore(int position){
+        if(position== PlayersAdapter.PLAYERS) return canPullMorePlayers;
+        else return canPullMoreTeams;
     }
 
     private void parsePlayersArray(JSONArray array) throws JSONException

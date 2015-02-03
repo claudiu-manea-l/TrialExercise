@@ -1,5 +1,8 @@
 package com.codezapps.trialexercise.common;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 
 import com.google.gson.GsonBuilder;
@@ -32,14 +35,16 @@ public class Worker extends AsyncTask<String,Void,JSONHolder> {
 
     private IWorkerCallback mCallback;
     private int mRequestType;
+    private int mPosition;
     public Worker(IWorkerCallback callback,int request)
     {
         mCallback = callback;
         mRequestType = request;
+        mPosition=-1;
     }
-    @Override
-    protected void onPreExecute() {
-        mCallback.setIndeterminateProgress(true);
+    public Worker(IWorkerCallback callback,int request,int position){
+        this(callback,request);
+        mPosition=position;
     }
 
     protected JSONHolder doInBackground(String... param) {
@@ -80,29 +85,9 @@ public class Worker extends AsyncTask<String,Void,JSONHolder> {
     }
 
     protected void onPostExecute(JSONHolder result) {
-        mCallback.setIndeterminateProgress(false);
-        mCallback.postFinished(result,mRequestType);
+        mCallback.postFinished(result,mRequestType,mPosition);
     }
-    @Override
-    protected void onCancelled(){
-        mCallback.setIndeterminateProgress(false);
-    }
-/*
-    private JSONObject makeJSONObj(String searchString,String searchType,String offset){
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put(SEARCH_STRING, searchString);
-            jsonObject.put(SEARCH_TYPE, searchType);
-            jsonObject.put(SEARCH_OFFSET, offset);
-            Log.e("xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"," JSON= "+jsonObject.toString());
-        } catch(JSONException ex){
-            if(MainActivity.LOGD) {
-                Log.d("Worker", "JSON Exception");
-                ex.printStackTrace();
-            }
-        }
-        return jsonObject;
-    }*/
+
     private Map<String,String> getPairs(String searchString,String searchType,String offset)
     {
         Map<String,String> map = new HashMap<String,String>();

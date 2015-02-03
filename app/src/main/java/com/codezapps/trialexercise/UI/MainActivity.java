@@ -1,6 +1,9 @@
 package com.codezapps.trialexercise.UI;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.StrictMode;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -11,9 +14,13 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ExpandableListView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.codezapps.trialexercise.UI.fragments.PagerFragment;
+import com.codezapps.trialexercise.UI.fragments.PlayersAdapter;
 import com.codezapps.trialexercise.UI.fragments.PlayersFragment;
+import com.codezapps.trialexercise.UI.fragments.TeamsAdapter;
 import com.codezapps.trialexercise.UI.fragments.TeamsFragment;
 import com.codezapps.trialexercise.common.IActivity;
 import com.codezapps.trialexercise.common.IWorkerCallback;
@@ -34,13 +41,12 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
 
     public static final boolean LOGD = false;
 
-    private PlayersFragment mPlayersFragment;
-    private TeamsFragment mTeamsFragment;
+    private PagerFragment mPagerFragment;
 
     private QueryTimer mQueryTimer;
 
     private SearchView mSearchView;
-    private String mSearchArgs="a";
+    private String mSearchArgs;
 
 
     @Override
@@ -48,16 +54,14 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
         miniSetup();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         mQueryTimer = QueryTimer.newInstance(this);
 
-        mPlayersFragment = PlayersFragment.newInstance();
-        mTeamsFragment = TeamsFragment.newInstance();
+        mPagerFragment = PagerFragment.newInstance();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.content_frame,mPagerFragment).commit();
 
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container_players,mPlayersFragment).commit();
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container_teams,mTeamsFragment).commit();
-        initialPull();
+        if(isNetworkOnline()) initialPull();
     }
 
     private void miniSetup(){
@@ -110,7 +114,7 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
             @Override
             public boolean onClose() {
                 initialPull();
-                return true;
+                return false;
             }
         });
 
@@ -128,12 +132,11 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
                 return true;
 
         }
-
         return super.onOptionsItemSelected(item);
     }
 
     public void initialPull(){
-        String[] params={mSearchArgs,"","0"};
+        String[] params={"bar","","0"};
         new Worker(this,Worker.INITIAL_REQUEST).execute(params);
     }
 
@@ -141,24 +144,42 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
          String searchType="";
          searchType += (position==0) ? "players" : "teams";
          String[] params={mSearchArgs,searchType,offset+""};
+         System.out.println(params.toString());
          new Worker(this,Worker.SHOWMORE_REQUEST).execute(params);
     }
 
-    public void postFinished(JSONHolder jsonHolder,int requestType)
+    public void postFinished(JSONHolder jsonHolder,int requestType,int position)
     {
-        if(jsonHolder.hasPlayers())
-            mPlayersFragment.handleWorkerPost(jsonHolder,requestType);
-        if(jsonHolder.hasTeams())
-            mTeamsFragment.handleWorkerPost(jsonHolder,requestType);
-    }
-
-    public void setIndeterminateProgress(boolean bool){
-        setSupportProgressBarIndeterminateVisibility(true);
+            mPagerFragment.getFragment(PlayersAdapter.PLAYERS)
+                    .handleWorkerPost(jsonHolder, requestType, position);
+            mPagerFragment.getFragment(TeamsAdapter.TEAMS)
+                    .handleWorkerPost(jsonHolder, requestType, position);
     }
 
     public String getSearchArgs(){
         return mSearchArgs;
     }
 
+    public boolean isNetworkOnline() {
+        boolean status=false;
+        try{
+            ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo netInfo = cm.getNetworkInfo(0);
+            if (netInfo != null && netInfo.getState()==NetworkInfo.State.CONNECTED) {
+                status= true;
+            }else {
+                netInfo = cm.getNetworkInfo(1);
+                if(netInfo!=null && netInfo.getState()==NetworkInfo.State.CONNECTED)
+                    status= true;
+            }
+        }catch(Exception e){
+            e.printStackTrace();
+            return false;
+        }
+        return status;
 
-  }
+    }
+
+
+
+}

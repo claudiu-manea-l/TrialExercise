@@ -47,14 +47,9 @@ public class PlayersFragment extends ListFragment {
         if (null != mCallback) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mCallback.onItemClick(mPlayers.get(position).getName());
+            if(position==mPlayers.size()) mCallback.fetchMore(PlayersAdapter.PLAYERS,mPlayers.size());
+            else mCallback.onItemClick(mPlayers.get(position).getName());
         }
-    }
-
-    @Override
-    public void onClick(View v){
-        if (null != mCallback)
-           mCallback.fetchMore(PlayersAdapter.PLAYERS,mPlayers.size());
     }
 
     public ArrayList<Player> getDataCollection(){
@@ -79,8 +74,12 @@ public class PlayersFragment extends ListFragment {
         mPlayers.addAll(jsonHolder.getPlayers());
     }
 
-    public void showMore(JSONHolder jsonHolder)   {
+    public void showMore(JSONHolder jsonHolder,int position)   {
+        if(position==PlayersAdapter.PLAYERS)
         if(jsonHolder.hasPlayers()) mPlayers.addAll(jsonHolder.getPlayers());
-        else Toast.makeText(getActivity(), "No players were fetched", Toast.LENGTH_SHORT).show();
+        else {
+            Toast.makeText(getActivity(), "No players were fetched", Toast.LENGTH_SHORT).show();
+            mFooterView.setVisibility(View.INVISIBLE);
+        }
     }
 }

@@ -7,6 +7,14 @@
     <ListView android:id="@+id/list_view" android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
+    <ProgressBar
+        android:id="@+id/progress"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:indeterminate="true"/>
+
     <TextView android:id="@+id/empty" android:layout_width="match_parent"
         android:layout_height="match_parent" android:gravity="center" />
 

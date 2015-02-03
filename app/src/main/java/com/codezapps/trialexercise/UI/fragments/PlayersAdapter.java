@@ -41,8 +41,8 @@ public class PlayersAdapter extends BaseAdapter{
     @Override
     public View getView(int position,View convertView, ViewGroup parent){
         Player currPlayer = mPlayers.get(position);
-
         View view = convertView;
+
         if((position!=mPlayers.size()-1) && !(mPlayers.isEmpty())) {
             if (convertView == null) {
                 view = mInflater.inflate(R.layout.component_list_players, null);
@@ -56,11 +56,11 @@ public class PlayersAdapter extends BaseAdapter{
                 sHolder = (ViewHolder) view.getTag();
             }
             sHolder.tv_name.setText(currPlayer.getName());
-          //  sHolder.tv_age.setText(currPlayer.getAge());
-           // sHolder.tv_club.setText(currPlayer.getClub());
+            sHolder.tv_age.setText(currPlayer.getAge()+"");
+            sHolder.tv_club.setText(currPlayer.getClub());
             FlagName.setDrawableToImageView(
                     sHolder.iv_flag, mContext, currPlayer.getNationality());
-        } else populateDummy(view,position);
+    } else populateDummy(view,position);
         return view;
     }
 

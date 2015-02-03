@@ -76,7 +76,6 @@ public class QueryTimer {
             String[] params = {args,"","0"};
             mWorker = new Worker(mCallback,Worker.SEARCH_REQUEST);
             mWorker.execute(params);
-            mCallback.setIndeterminateProgress(true);
         }
     }
 }

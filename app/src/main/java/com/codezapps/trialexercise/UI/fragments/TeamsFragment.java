@@ -49,16 +49,10 @@ public class TeamsFragment extends ListFragment{
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (null != mCallback) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
+            if(position==mTeams.size()) mCallback.fetchMore(TeamsAdapter.TEAMS,mTeams.size());
+            else
             mCallback.onItemClick(mTeams.get(position).getName());
         }
-    }
-
-    @Override
-    public void onClick(View v){
-        if (null != mCallback)
-            mCallback.fetchMore(TeamsAdapter.TEAMS,mTeams.size());
     }
 
     public ArrayList<Team> getDataCollection(){
@@ -85,8 +79,12 @@ public class TeamsFragment extends ListFragment{
         mTeams.addAll(jsonHolder.getTeams());
     }
 
-    public void showMore(JSONHolder jsonHolder){
-        if(jsonHolder.hasTeams()) mTeams.addAll(jsonHolder.getTeams());
-        else Toast.makeText(getActivity(),"No teams were fetched",Toast.LENGTH_SHORT).show();
+    public void showMore(JSONHolder jsonHolder,int position){
+        if(position==TeamsAdapter.TEAMS)
+            if(jsonHolder.hasPlayers()) mTeams.addAll(jsonHolder.getTeams());
+            else {
+                Toast.makeText(getActivity(), "No teams were fetched", Toast.LENGTH_SHORT).show();
+                mFooterView.setVisibility(View.INVISIBLE);
+            }
     }
 }

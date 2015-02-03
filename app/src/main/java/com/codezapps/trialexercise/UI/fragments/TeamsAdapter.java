@@ -61,7 +61,7 @@ public class TeamsAdapter extends BaseAdapter{
             sHolder.tv_stadium.setText(mTeams.get(position).getStadium());
             FlagName.setDrawableToImageView(
                     sHolder.iv_flag, mContext, mTeams.get(position).getNationality());
-        } else populateDummy(view,position);
+    } else populateDummy(view,position);
         return view;
     }
 

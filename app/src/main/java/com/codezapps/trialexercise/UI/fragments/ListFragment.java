@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.codezapps.trialexercise.R;
@@ -17,7 +18,8 @@ import com.codezapps.trialexercise.common.JSONHolder;
 import com.codezapps.trialexercise.common.Worker;
 
 
-public abstract class ListFragment extends Fragment implements ListView.OnItemClickListener, View.OnClickListener   {
+public abstract class ListFragment extends Fragment implements
+        ListView.OnItemClickListener {
 
     //protected abstract BaseAdapter initAdapter();
 
@@ -32,12 +34,14 @@ public abstract class ListFragment extends Fragment implements ListView.OnItemCl
      * Views.
      */
     protected BaseAdapter mAdapter;
+    protected ProgressBar mProgressBar;
+    protected View mFooterView;
 
     protected abstract String getName();
     protected abstract BaseAdapter initAdapter();
     protected abstract void handleInitialRequest(JSONHolder jsonHolder);
     protected abstract void handleSearchRequest(JSONHolder jsonHolder);
-    protected abstract void showMore(JSONHolder jsonHolder);
+    protected abstract void showMore(JSONHolder jsonHolder,int position);
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -46,20 +50,16 @@ public abstract class ListFragment extends Fragment implements ListView.OnItemCl
 
         mListView = (ListView) view.findViewById(R.id.list_view);
         mListView.setEmptyView(view.findViewById(R.id.empty));
-        View header = inflater.inflate(R.layout.component_list_groupitem,null);
-        TextView title = (TextView) header.findViewById(R.id.group_title);
-        title.setText(getName());
-        mListView.addHeaderView(header);
-
-        View footer = inflater.inflate(R.layout.component_list_showmore,null);
-        TextView showMore = (TextView) footer.findViewById(R.id.group_title);
+        mListView.setOnItemClickListener(this);
+        mFooterView = inflater.inflate(R.layout.component_list_showmore,null);
+        TextView showMore = (TextView) mFooterView.findViewById(R.id.group_title);
         showMore.setText("More "+getName());
 
-        footer.setOnClickListener(this);
-        mListView.addFooterView(footer);
+        mListView.addFooterView(mFooterView,null,true);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
 
         // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+
         mAdapter = initAdapter();
         mListView.setAdapter(mAdapter);
         return view;
@@ -100,7 +100,7 @@ public abstract class ListFragment extends Fragment implements ListView.OnItemCl
         }
     }
 
-    public void handleWorkerPost(JSONHolder jsonHolder,int requestType)
+    public void handleWorkerPost(JSONHolder jsonHolder,int requestType,int position)
     {
         switch(requestType) {
             case Worker.INITIAL_REQUEST:
@@ -110,13 +110,13 @@ public abstract class ListFragment extends Fragment implements ListView.OnItemCl
                 handleSearchRequest(jsonHolder);
                 break;
             case Worker.SHOWMORE_REQUEST:
-                showMore(jsonHolder);
+                showMore(jsonHolder,position);
                 break;
             default:
                 break;
         }
+        mProgressBar.setVisibility(View.INVISIBLE);
         mAdapter.notifyDataSetChanged();
     };
-
 
 }
