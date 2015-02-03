@@ -67,19 +67,25 @@ public class PlayersFragment extends ListFragment {
 
     public void handleInitialRequest(JSONHolder jsonHolder){
         mPlayers.addAll(jsonHolder.getPlayers());
+        mFooterView.setVisibility(View.VISIBLE);
     }
 
     public void handleSearchRequest(JSONHolder jsonHolder){
         mPlayers.clear();
         mPlayers.addAll(jsonHolder.getPlayers());
+        if(mPlayers.size()<10) mFooterView.setVisibility(View.INVISIBLE);
     }
 
     public void showMore(JSONHolder jsonHolder,int position)   {
-        if(position==PlayersAdapter.PLAYERS)
-        if(jsonHolder.hasPlayers()) mPlayers.addAll(jsonHolder.getPlayers());
+        if(position==PlayersAdapter.PLAYERS && jsonHolder.hasPlayers()) {
+            mPlayers.addAll(jsonHolder.getPlayers());
+            if(mPlayers.size()%10!=0) mFooterView.setVisibility(View.INVISIBLE);
+        }
+
         else {
             Toast.makeText(getActivity(), "No players were fetched", Toast.LENGTH_SHORT).show();
             mFooterView.setVisibility(View.INVISIBLE);
         }
+
     }
 }

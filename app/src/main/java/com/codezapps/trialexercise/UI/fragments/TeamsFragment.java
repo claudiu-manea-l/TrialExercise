@@ -71,6 +71,7 @@ public class TeamsFragment extends ListFragment{
     public void handleInitialRequest(JSONHolder jsonHolder)
     {
         mTeams.addAll(jsonHolder.getTeams());
+        mFooterView.setVisibility(View.VISIBLE);
     }
 
     public void handleSearchRequest(JSONHolder jsonHolder)

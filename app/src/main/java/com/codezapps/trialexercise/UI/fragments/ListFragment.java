@@ -82,6 +82,11 @@ public abstract class ListFragment extends Fragment implements
         mCallback = null;
     }
 
+    public void setProgressIndeterminate()
+    {
+        mProgressBar.setVisibility(View.VISIBLE);
+    }
+
     public void notifyDataChanged()
     {
         if(mAdapter!=null) mAdapter.notifyDataSetChanged();

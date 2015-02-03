@@ -17,6 +17,7 @@ import android.widget.ExpandableListView;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
+import com.codezapps.trialexercise.UI.fragments.ListFragment;
 import com.codezapps.trialexercise.UI.fragments.PagerFragment;
 import com.codezapps.trialexercise.UI.fragments.PlayersAdapter;
 import com.codezapps.trialexercise.UI.fragments.PlayersFragment;
@@ -41,12 +42,13 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
 
     public static final boolean LOGD = false;
 
+    private int mOffset=0;
     private PagerFragment mPagerFragment;
 
     private QueryTimer mQueryTimer;
 
     private SearchView mSearchView;
-    private String mSearchArgs;
+    private String mSearchArgs="a";
 
 
     @Override
@@ -136,8 +138,13 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
     }
 
     public void initialPull(){
-        String[] params={"bar","","0"};
+        String[] params={"a","","0"};
         new Worker(this,Worker.INITIAL_REQUEST).execute(params);
+        if(mOffset>0)
+        for(int i=0;i<2;i++)
+        {ListFragment frag = mPagerFragment.getFragment(i);
+            if(frag!=null) frag.setProgressIndeterminate();}
+        mOffset++;
     }
 
      public void fetchMore(int position,int offset){
@@ -145,7 +152,7 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
          searchType += (position==0) ? "players" : "teams";
          String[] params={mSearchArgs,searchType,offset+""};
          System.out.println(params.toString());
-         new Worker(this,Worker.SHOWMORE_REQUEST).execute(params);
+         new Worker(this,Worker.SHOWMORE_REQUEST,position).execute(params);
     }
 
     public void postFinished(JSONHolder jsonHolder,int requestType,int position)

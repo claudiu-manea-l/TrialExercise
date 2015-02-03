@@ -65,6 +65,8 @@ public class PlayersAdapter extends BaseAdapter{
     }
 
     private View populateDummy(View view,int position){
+        if(mPlayers.size()%10!=0)
+        {
         view = mInflater.inflate(R.layout.component_list_showmore,null);
         TextView showMore = (TextView) view.findViewById(R.id.group_title);
 
@@ -76,6 +78,9 @@ public class PlayersAdapter extends BaseAdapter{
                 mCallback.fetchMore(PLAYERS,clickPosition);
             }
         });
+
+            view.setVisibility(View.INVISIBLE);
+        }
         return view;
     }
 
