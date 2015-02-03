@@ -1,9 +1,9 @@
-package com.codezapps.trialexercise.Common;
+package com.codezapps.trialexercise.common;
 
 import android.util.Log;
 
-import com.codezapps.trialexercise.Model.Player;
-import com.codezapps.trialexercise.Model.Team;
+import com.codezapps.trialexercise.model.Player;
+import com.codezapps.trialexercise.model.Team;
 import com.codezapps.trialexercise.UI.MainActivity;
 
 import org.json.JSONArray;

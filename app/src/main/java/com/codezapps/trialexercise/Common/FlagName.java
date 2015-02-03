@@ -1,4 +1,4 @@
-package com.codezapps.trialexercise.Common;
+package com.codezapps.trialexercise.common;
 //For the trial use these a mdpi drawables. Do not spend time creating resized variation.
 //unkown.png should be the default flag when no matches can be made.
 //Use the following to help you match flags when the nationality and country text is not identical to the flag file name:

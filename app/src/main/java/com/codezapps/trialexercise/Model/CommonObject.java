@@ -1,4 +1,4 @@
-package com.codezapps.trialexercise.Model;
+package com.codezapps.trialexercise.model;
 
 /**
  * Created by viperime on 2/2/2015.

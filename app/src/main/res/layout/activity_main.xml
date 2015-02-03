@@ -1,19 +1,16 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context=".UI.MainActivity">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:context=".UI.MainActivity">
 
-    <ExpandableListView
-        android:id="@+id/listView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="@color/gray_overlay"/>
+<FrameLayout
+    android:id="@+id/container_players"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />
+    <FrameLayout
+        android:id="@+id/container_teams"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 
-    <TextView
-        android:id="@+id/empty"
-        android:text="@string/strNoRecordsFound"
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        style="@android:style/TextAppearance.Large"
-        android:gravity="center"/>
-
-</FrameLayout>
+</LinearLayout>

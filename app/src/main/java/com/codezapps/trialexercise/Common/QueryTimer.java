@@ -1,4 +1,4 @@
-package com.codezapps.trialexercise.Common;
+package com.codezapps.trialexercise.common;
 
 import java.util.Timer;
 import java.util.TimerTask;

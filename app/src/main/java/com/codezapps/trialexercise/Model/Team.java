@@ -1,4 +1,4 @@
-package com.codezapps.trialexercise.Model;
+package com.codezapps.trialexercise.model;
 
 import org.json.JSONException;
 import org.json.JSONObject;

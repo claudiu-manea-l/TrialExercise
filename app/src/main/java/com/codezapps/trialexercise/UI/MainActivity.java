@@ -1,7 +1,6 @@
 package com.codezapps.trialexercise.UI;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.StrictMode;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
@@ -12,19 +11,19 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.widget.ExpandableListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import com.codezapps.trialexercise.Common.IActivity;
-import com.codezapps.trialexercise.Common.IWorkerCallback;
-import com.codezapps.trialexercise.Common.JSONHolder;
-import com.codezapps.trialexercise.Common.QueryTimer;
-import com.codezapps.trialexercise.Common.Worker;
-import com.codezapps.trialexercise.Model.CommonObject;
-import com.codezapps.trialexercise.Model.Player;
-import com.codezapps.trialexercise.Model.Team;
+import com.codezapps.trialexercise.UI.fragments.PlayersFragment;
+import com.codezapps.trialexercise.UI.fragments.TeamsFragment;
+import com.codezapps.trialexercise.common.IActivity;
+import com.codezapps.trialexercise.common.IWorkerCallback;
+import com.codezapps.trialexercise.common.JSONHolder;
+import com.codezapps.trialexercise.common.QueryTimer;
+import com.codezapps.trialexercise.common.Worker;
+import com.codezapps.trialexercise.model.CommonObject;
+import com.codezapps.trialexercise.model.Player;
+import com.codezapps.trialexercise.model.Team;
 import com.codezapps.trialexercise.R;
-import com.codezapps.trialexercise.UI.ListAdapter;
 
 import java.util.ArrayList;
 
@@ -35,15 +34,13 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
 
     public static final boolean LOGD = false;
 
-    private ExpandableListView mExpandableListView;
-    private ListAdapter mAdapter;
+    private PlayersFragment mPlayersFragment;
+    private TeamsFragment mTeamsFragment;
+
     private QueryTimer mQueryTimer;
 
     private SearchView mSearchView;
     private String mSearchArgs="a";
-
-    private ArrayList<Player> mPlayersArray;
-    private ArrayList<Team> mTeamsArray;
 
 
     @Override
@@ -51,11 +48,15 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
         miniSetup();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-        mPlayersArray = new ArrayList<Player>();
-        mTeamsArray = new ArrayList<Team>();
         mQueryTimer = QueryTimer.newInstance(this);
-        initExpListView(mPlayersArray, mTeamsArray);
+
+        mPlayersFragment = PlayersFragment.newInstance();
+        mTeamsFragment = TeamsFragment.newInstance();
+
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container_players,mPlayersFragment).commit();
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container_teams,mTeamsFragment).commit();
         initialPull();
     }
 
@@ -73,42 +74,10 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
 
     }
 
-    private void initExpListView(ArrayList<Player> players,ArrayList<Team> teams)
-    {
-        ExpandableListView mExpandableListView = (ExpandableListView) findViewById(R.id.listView);
 
-        mAdapter = new ListAdapter(this,players,teams);
-
-        mExpandableListView.setAdapter(mAdapter);
-
-        mExpandableListView.setGroupIndicator(null);
-
-        mExpandableListView.expandGroup(0);
-        mExpandableListView.expandGroup(1);
-
-        mExpandableListView.setOnGroupClickListener(new ExpandableListView.OnGroupClickListener() {
-            @Override
-            public boolean onGroupClick(ExpandableListView parent, View v, int groupPosition, long id) {
-                // Doing nothing
-                return true;
-            }
-        });
-        mExpandableListView.setEmptyView(findViewById(R.id.empty));
-
-        mExpandableListView.setOnChildClickListener(new ExpandableListView.OnChildClickListener() {
-
-            @Override
-            public boolean onChildClick(ExpandableListView expandableListView, View view, int groupPosition, int childPosition, long l) {
-                clickOn(groupPosition,childPosition);
-                return true;
-            }
-        });
-    }
-
-    private void clickOn(int groupPosition,int childPosition){
-        CommonObject obj = (CommonObject) mAdapter.getChild(groupPosition,childPosition);
+    public void onItemClick(String name){
         Intent intent = new Intent(getBaseContext(),SimpleActivity.class);
-        intent.putExtra(ACTIVITY_ARGS,obj.getName());
+        intent.putExtra(ACTIVITY_ARGS,name);
         startActivity(intent);
     }
 
@@ -177,21 +146,10 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
 
     public void postFinished(JSONHolder jsonHolder,int requestType)
     {
-        switch(requestType) {
-            case Worker.INITIAL_REQUEST:
-                mPlayersArray.addAll(jsonHolder.getPlayers());
-                mTeamsArray.addAll(jsonHolder.getTeams());
-                break;
-            case Worker.SEARCH_REQUEST:
-                handleSearchRequest(jsonHolder);
-                break;
-            case Worker.SHOWMORE_REQUEST:
-                showMore(jsonHolder);
-                break;
-            default:
-                break;
-        }
-        mAdapter.notifyDataSetChanged();
+        if(jsonHolder.hasPlayers())
+            mPlayersFragment.handleWorkerPost(jsonHolder,requestType);
+        if(jsonHolder.hasTeams())
+            mTeamsFragment.handleWorkerPost(jsonHolder,requestType);
     }
 
     public void setIndeterminateProgress(boolean bool){
@@ -202,18 +160,5 @@ public class MainActivity extends ActionBarActivity implements IActivity,IWorker
         return mSearchArgs;
     }
 
-    public void handleSearchRequest(JSONHolder jsonHolder)
-    {
-        mPlayersArray.clear();
-        mTeamsArray.clear();
-        mPlayersArray.addAll(jsonHolder.getPlayers());
-        mTeamsArray.addAll(jsonHolder.getTeams());
-    }
 
-    public void showMore(JSONHolder jsonHolder){
-        if(jsonHolder.hasPlayers()) mPlayersArray.addAll(jsonHolder.getPlayers());
-        else Toast.makeText(this,"No players were fetched",Toast.LENGTH_SHORT).show();
-        if(jsonHolder.hasTeams()) mTeamsArray.addAll(jsonHolder.getTeams());
-            else Toast.makeText(this,"No teams were fetched",Toast.LENGTH_SHORT).show();
-    }
   }
